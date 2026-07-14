@@ -1,7 +1,11 @@
 use eframe::egui;
 
 fn main() {
-    let native_options = eframe::NativeOptions::default();
+    let native_options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size(egui::vec2(400.0, 600.0)),
+        ..Default::default()
+    };
     eframe::run_native("My egui App", native_options, Box::new(|cc| Ok(Box::new(MyEguiApp::new(cc)))));
 }
 
