@@ -3,29 +3,54 @@ use eframe::egui;
 fn main() {
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size(egui::vec2(400.0, 600.0)),
+            .with_inner_size(egui::vec2(300.0, 400.0)),
         ..Default::default()
     };
-    eframe::run_native("My egui App", native_options, Box::new(|cc| Ok(Box::new(MyEguiApp::new(cc)))));
+    let _ = eframe::run_native("Bank Savings Calculator", native_options, Box::new(|_cc| Ok(Box::new(MyEguiApp::default()))));
 }
 
 #[derive(Default)]
-struct MyEguiApp {}
+struct MyEguiApp {
+    input_amount: String,
+    output: String,
+}
 
 impl MyEguiApp {
-    fn new(cc: &eframe::CreationContext<'_>) -> Self {
-        // Customize egui here with cc.egui_ctx.set_fonts and cc.egui_ctx.set_global_style.
-        // Restore app state using cc.storage (requires the "persistence" feature).
-        // Use the cc.gl (a glow::Context) to create graphics shaders and buffers that you can use
-        // for e.g. egui::PaintCallback.
-        Self::default()
+    fn calculate(&mut self) {
+        self.output = self.input_amount.clone();
     }
 }
 
 impl eframe::App for MyEguiApp {
-   fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
+   fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
        egui::CentralPanel::default().show(ui, |ui| {
-            ui.heading("Hello World!");
-       });
+            ui.vertical_centered(|ui| {
+                ui.heading("Bank Savings Calculator");
+            });
+
+            ui.add_space(20.0);
+
+            ui.horizontal(|ui| {
+                ui.label("Amount: $");
+                let response = ui.text_edit_singleline(&mut self.input_amount);
+                if response.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) {
+                    self.calculate();
+                }
+            });
+
+            ui.add_space(10.0);
+
+            if ui.button("Calculate").clicked() {
+                self.calculate();
+            }
+
+            ui.add_space(20.0);
+
+            ui.separator();
+
+            ui.add_space(10.0);
+
+            ui.label(&self.output);
+        });
    }
 }
